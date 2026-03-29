@@ -73,14 +73,51 @@ window.LC.firebase.saveUser = async function(userObj) {
 // Fetch all registered users for leaderboard
 window.LC.firebase.getAllUsers = async function() {
   try {
-    console.log('Firebase: Fetching all users...');
-    const snapshot = await get(child(ref(db), 'user_registry'));
-    if (snapshot.exists()) {
-      const users = snapshot.val();
-      console.log('Firebase: Loaded', Object.keys(users).length, 'users');
-      return users;
-    }
-    console.log('Firebase: No users found in registry.');
+    console.log('Firebase: Fetching all users from registry and users nodes...');
+    // Fetch both nodes in parallel
+    const [regSnapshot, userSnapshot] = await Promise.all([
+      get(child(ref(db), 'user_registry')),
+      get(child(ref(db), 'users'))
+    ]);
+    
+    const registry = regSnapshot.exists() ? regSnapshot.val() : {};
+    const users = userSnapshot.exists() ? userSnapshot.val() : {};
+    
+    // Combine them. 'users' node is the source of truth for XP/Level.
+    // 'registry' node is the source of truth for Names/Emails/Passwords.
+    const combined = {};
+    
+    // Start with all users who have progress
+    Object.keys(users).forEach(key => {
+      const u = users[key];
+      const email = key.replace(/,/g, '.');
+      const reg = registry[key] || {};
+      
+      combined[key] = {
+        email: email,
+        displayName: reg.displayName || email.split('@')[0],
+        xp: u.xp || 0,
+        level: u.level || 1,
+        password: reg.password || null
+      };
+    });
+    
+    // Add any users in registry who don't have progress yet
+    Object.keys(registry).forEach(key => {
+      if (!combined[key]) {
+        const reg = registry[key];
+        combined[key] = {
+          email: reg.email,
+          displayName: reg.displayName || reg.email.split('@')[0],
+          xp: 0,
+          level: 1,
+          password: reg.password || null
+        };
+      }
+    });
+    
+    console.log('Firebase: Loaded', Object.keys(combined).length, 'combined users');
+    return combined;
   } catch (e) {
     console.error('Firebase getAllUsers error:', e);
   }

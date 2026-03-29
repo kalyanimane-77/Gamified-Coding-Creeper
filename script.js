@@ -507,19 +507,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // If not in local or local doesn't have the user, fetch fresh from Firebase
     try {
       const allUsers = await LC.firebase.getAllUsers();
-      const userKey = Object.keys(allUsers).find(k => allUsers[k].email === email);
+      // Look for user by email key or within the user object
+      const userKey = Object.keys(allUsers).find(k => k.replace(/,/g, '.') === email || allUsers[k].email === email);
+      
       if (userKey) {
-        stored = allUsers[userKey];
-        // Update local storage with fresh data
-        users[email] = stored;
+        const remoteUser = allUsers[userKey];
+        // If we have a remote password, it's our best bet for cross-device
+        if (remoteUser.password) {
+          stored = remoteUser;
+        } else if (stored && stored.password) {
+          // If remote doesn't have password but local does, use local and we will push it later
+        } else {
+          // No password anywhere - this user might only have progress but no account record
+          stored = remoteUser; 
+        }
+        
+        // Update local storage with fresh data (keeping local password if remote is missing)
+        users[email] = {
+          ...stored,
+          password: stored.password || (users[email] && users[email].password)
+        };
         LC.saveUsers(users);
       }
     } catch (e) {
       console.error('script.js: Firebase fetch error during signin:', e);
-      // Fallback to local 'stored' if it exists
     }
 
-    if (!stored || stored.password !== password) {
+    if (!stored || !stored.password || stored.password !== password) {
       signinError.textContent = 'Invalid email or password.';
       signinError.style.color = 'var(--error-red)';
       return;
@@ -528,7 +542,21 @@ document.addEventListener('DOMContentLoaded', function() {
     signinError.textContent = 'Syncing your progress...';
     LC.setUser({ email: email, displayName: stored.displayName });
 
-    // Sync from Firebase on login
+    // PROACTIVE SYNC: Ensure Firebase has the correct account record (email/password/name)
+    // This repairs the "missing user_registry" issue for users who log in locally first.
+    if (LC.firebase && LC.firebase.saveUser) {
+      try {
+        await LC.firebase.saveUser({
+          email: email,
+          password: password,
+          displayName: stored.displayName
+        });
+      } catch (e) {
+        console.warn('script.js: Could not sync account to Firebase registry:', e);
+      }
+    }
+
+    // Sync progress from Firebase on login
     try {
       if (LC.firebase && LC.firebase.syncFromRemote) {
         await LC.firebase.syncFromRemote(email);
@@ -576,18 +604,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if user already exists in Firebase
     try {
       const allUsers = await LC.firebase.getAllUsers();
-      const userKey = Object.keys(allUsers).find(k => allUsers[k].email === email);
-      if (userKey) {
+      const userKey = Object.keys(allUsers).find(k => k.replace(/,/g, '.') === email || allUsers[k].email === email);
+      if (userKey && allUsers[userKey].password) {
         signupError.textContent = 'An account with this email already exists.';
         signupError.style.color = 'var(--error-red)';
         return;
       }
     } catch (e) {
       console.error('script.js: Signup existence check failed:', e);
-      // If we can't check, we might risk overwriting, but it's better to show an error
-      signupError.textContent = 'Unable to verify account availability. Try again later.';
-      signupError.style.color = 'var(--error-red)';
-      return;
     }
 
     signupError.textContent = 'Creating account...';

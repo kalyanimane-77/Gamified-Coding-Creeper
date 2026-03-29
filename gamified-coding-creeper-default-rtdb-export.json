@@ -1,0 +1,46 @@
+{
+  "users": {
+    "abcd@gmail,com": {
+      "kidsMode": true
+    },
+    "admin@test,com": {
+      "kidsMode": false,
+      "lastSeen": 1769851150138,
+      "level": 10,
+      "xp": 12500
+    },
+    "aniket@gmail,com": {
+      "kidsMode": false,
+      "lastSeen": 1769853693633,
+      "level": 1,
+      "xp": 30
+    },
+    "k@gmail,com": {
+      "kidsMode": false
+    },
+    "kalyani,mane18@gmail,com": {
+      "kidsMode": true,
+      "lastSeen": 1770005508364,
+      "level": 1,
+      "xp": 30
+    },
+    "kid@test,com": {
+      "kidsMode": true,
+      "lastSeen": 1769851150138,
+      "level": 2,
+      "xp": 300
+    },
+    "pratham@gmail,com": {
+      "kidsMode": false,
+      "lastSeen": 1770039073927,
+      "level": 1,
+      "xp": 24
+    },
+    "student@test,com": {
+      "kidsMode": false,
+      "lastSeen": 1769851150138,
+      "level": 7,
+      "xp": 5500
+    }
+  }
+}
