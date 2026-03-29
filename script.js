@@ -281,6 +281,7 @@ LC.setKidsMode = function (on) {
   script.type = 'module';
   script.src = 'firebase-helper.js';
   script.onload = function() {
+    console.log('script.js: firebase-helper.js loaded');
     // Attempt to sync on load if logged in
     var user = LC.getUser();
     if (user && LC.firebase && LC.firebase.syncFromRemote) {
@@ -288,11 +289,6 @@ LC.setKidsMode = function (on) {
           // Dispatch a custom event when sync is complete
           window.dispatchEvent(new CustomEvent('LC_FirebaseSynced'));
       });
-    }
-    
-    // Also notify that firebase is ready
-    if (window.LC.onFirebaseReady) {
-        window.LC.onFirebaseReady();
     }
   };
   document.head.appendChild(script);
@@ -429,17 +425,37 @@ document.addEventListener('DOMContentLoaded', function() {
   var usersLoaded = false;
   
   // Expose a function that firebase-helper can call once ready
+  var oldReady = window.LC.onFirebaseReady;
   window.LC.onFirebaseReady = async function() {
+      if (oldReady) oldReady();
+      console.log('script.js: onFirebaseReady called');
+      var statusEl = document.getElementById('firebase-status');
+      if (statusEl) {
+          statusEl.textContent = 'Database connected ✅';
+          statusEl.style.color = 'var(--neon-purple)';
+      }
+      
       if (LC.firebase && LC.firebase.getAllUsers) {
-          var remoteUsers = await LC.firebase.getAllUsers();
-          if (remoteUsers) {
-              var localUsers = LC.getUsers();
-              // Merge remote users into local storage
-              Object.keys(remoteUsers).forEach(k => {
-                  const user = remoteUsers[k];
-                  localUsers[user.email] = user;
-              });
-              LC.saveUsers(localUsers);
+          try {
+              var remoteUsers = await LC.firebase.getAllUsers();
+              if (remoteUsers) {
+                  var localUsers = LC.getUsers();
+                  // Merge remote users into local storage
+                  Object.keys(remoteUsers).forEach(k => {
+                      const user = remoteUsers[k];
+                      if (user && user.email) {
+                        localUsers[user.email] = user;
+                      }
+                  });
+                  LC.saveUsers(localUsers);
+                  console.log('script.js: Local registry updated from Firebase');
+              }
+          } catch (e) {
+              console.error('script.js: Error fetching users on ready:', e);
+              if (statusEl) {
+                  statusEl.textContent = 'Database connection issue ⚠️';
+                  statusEl.style.color = 'var(--error-red)';
+              }
           }
       }
       usersLoaded = true;
@@ -460,88 +476,143 @@ document.addEventListener('DOMContentLoaded', function() {
 
   signinForm.addEventListener('submit', async function (e) {
     e.preventDefault();
-    signinError.textContent = 'Signing in...';
+    signinError.textContent = 'Connecting to server...';
+    signinError.style.color = 'var(--neon-purple)';
     
     var email = (document.getElementById('signin-email') || {}).value.trim();
     var password = (document.getElementById('signin-password') || {}).value;
     
-    // Check local storage first
+    // Ensure Firebase is ready or try to wait a bit
+    if (!LC.firebase || !LC.firebase.ready) {
+      console.log('script.js: Firebase not ready yet, waiting...');
+      let retries = 0;
+      while ((!LC.firebase || !LC.firebase.ready) && retries < 10) {
+        await new Promise(r => setTimeout(r, 500));
+        retries++;
+      }
+    }
+
+    if (!LC.firebase || !LC.firebase.ready) {
+      signinError.textContent = 'Server connection timeout. Please check your internet and try again.';
+      signinError.style.color = 'var(--error-red)';
+      return;
+    }
+
+    signinError.textContent = 'Verifying credentials...';
+    
+    // Try to get user from local first
     var users = LC.getUsers();
     var stored = users[email];
     
-    // If not in local storage, try fetching from Firebase
-    if (!stored && LC.firebase && LC.firebase.getAllUsers) {
+    // If not in local or local doesn't have the user, fetch fresh from Firebase
+    try {
       const allUsers = await LC.firebase.getAllUsers();
-      // Find user by email
       const userKey = Object.keys(allUsers).find(k => allUsers[k].email === email);
       if (userKey) {
         stored = allUsers[userKey];
-        // Save to local storage for future use
+        // Update local storage with fresh data
         users[email] = stored;
         LC.saveUsers(users);
       }
+    } catch (e) {
+      console.error('script.js: Firebase fetch error during signin:', e);
+      // Fallback to local 'stored' if it exists
     }
 
     if (!stored || stored.password !== password) {
       signinError.textContent = 'Invalid email or password.';
+      signinError.style.color = 'var(--error-red)';
       return;
     }
     
-    // Explicitly set in localStorage so it redirects correctly on other pages
+    signinError.textContent = 'Syncing your progress...';
     LC.setUser({ email: email, displayName: stored.displayName });
 
     // Sync from Firebase on login
-    if (LC.firebase && LC.firebase.syncFromRemote) {
-      await LC.firebase.syncFromRemote(email);
+    try {
+      if (LC.firebase && LC.firebase.syncFromRemote) {
+        await LC.firebase.syncFromRemote(email);
+      }
+    } catch (e) {
+      console.error('script.js: Progress sync error:', e);
     }
+    
+    signinError.textContent = 'Redirecting...';
     window.location.href = 'dashboard.html';
   });
 
   signupForm.addEventListener('submit', async function (e) {
     e.preventDefault();
-    signupError.textContent = 'Creating account...';
+    signupError.textContent = 'Connecting to server...';
+    signupError.style.color = 'var(--neon-purple)';
+
     var email = (document.getElementById('signup-email') || {}).value.trim();
     var password = (document.getElementById('signup-password') || {}).value;
     var displayName = (document.getElementById('signup-display') || {}).value.trim();
     
     if (password.length < 6) {
       signupError.textContent = 'Password must be at least 6 characters.';
+      signupError.style.color = 'var(--error-red)';
       return;
     }
 
+    // Ensure Firebase is ready
+    if (!LC.firebase || !LC.firebase.ready) {
+      let retries = 0;
+      while ((!LC.firebase || !LC.firebase.ready) && retries < 10) {
+        await new Promise(r => setTimeout(r, 500));
+        retries++;
+      }
+    }
+
+    if (!LC.firebase || !LC.firebase.ready) {
+      signupError.textContent = 'Server connection error. Please try again.';
+      signupError.style.color = 'var(--error-red)';
+      return;
+    }
+
+    signupError.textContent = 'Checking availability...';
+
     // Check if user already exists in Firebase
-    if (LC.firebase && LC.firebase.getAllUsers) {
+    try {
       const allUsers = await LC.firebase.getAllUsers();
       const userKey = Object.keys(allUsers).find(k => allUsers[k].email === email);
       if (userKey) {
         signupError.textContent = 'An account with this email already exists.';
+        signupError.style.color = 'var(--error-red)';
         return;
       }
-    } else {
-      // Fallback to local check if Firebase is not ready
-      var users = LC.getUsers();
-      if (users[email]) {
-        signupError.textContent = 'An account with this email already exists.';
-        return;
-      }
+    } catch (e) {
+      console.error('script.js: Signup existence check failed:', e);
+      // If we can't check, we might risk overwriting, but it's better to show an error
+      signupError.textContent = 'Unable to verify account availability. Try again later.';
+      signupError.style.color = 'var(--error-red)';
+      return;
     }
 
+    signupError.textContent = 'Creating account...';
     var newUser = { email: email, password: password, displayName: displayName || email.split('@')[0] };
     
-    // Save locally
-    var users = LC.getUsers();
-    users[email] = newUser;
-    LC.saveUsers(users);
-    LC.setUser({ email: email, displayName: newUser.displayName });
-    
-    // Sync to Firebase
-    if (LC.firebase && LC.firebase.saveUser) {
-      LC.firebase.saveUser(newUser);
-      // Also initialize empty progress in Firebase
-      LC.firebase.saveProgress(email, { xp: 0, level: 1 });
-    }
+    try {
+      // Sync to Firebase first to ensure we have a record
+      if (LC.firebase && LC.firebase.saveUser) {
+        await LC.firebase.saveUser(newUser);
+        await LC.firebase.saveProgress(email, { xp: 0, level: 1 });
+      }
 
-    window.location.href = 'dashboard.html';
+      // Save locally after successful Firebase save
+      var users = LC.getUsers();
+      users[email] = newUser;
+      LC.saveUsers(users);
+      LC.setUser({ email: email, displayName: newUser.displayName });
+
+      signupError.textContent = 'Success! Redirecting...';
+      window.location.href = 'dashboard.html';
+    } catch (e) {
+      console.error('script.js: Signup error:', e);
+      signupError.textContent = 'Error creating account. Please try again.';
+      signupError.style.color = 'var(--error-red)';
+    }
   });
 })();
 
