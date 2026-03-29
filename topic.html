@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamified Coding Creeper — Tutorial</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="app-shell">
+  <header class="app-header">
+    <div class="brand"><span class="title-icon">🦎</span> Gamified Coding Creeper</div>
+    <nav class="app-nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html">Profile</a>
+      <button type="button" class="btn-link" id="logout-btn">Logout</button>
+    </nav>
+  </header>
+  <main class="main-content">
+    <p><a href="dashboard.html">← Back to Dashboard</a></p>
+    <div id="topic-content"></div>
+    <div class="quiz-actions" style="margin-top:1.5rem;">
+      <a href="#" id="link-quiz" class="btn btn-primary">Take Quiz</a>
+      <a href="#" id="link-flashcards" class="btn btn-secondary">Flashcards</a>
+      <a href="#" id="link-challenges" class="btn btn-secondary">Challenges</a>
+    </div>
+  </main>
+  <script src="content.js?v=4"></script>
+  <script src="content-data.js?v=4"></script>
+  <script src="script.js?v=4"></script>
+  <script src="topic.js?v=4"></script>
+</body>
+</html>

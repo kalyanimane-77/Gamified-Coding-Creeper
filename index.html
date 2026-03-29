@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamified Coding Creeper — Welcome</title>
+  <link rel="stylesheet" href="style.css?v=6">
+</head>
+
+<body class="welcome-page-v2">
+  <nav class="welcome-nav">
+    <div class="welcome-logo">
+      <span class="title-icon">🦎</span> CodeCreeper
+    </div>
+    <div class="welcome-nav-links">
+      <a href="playground.html" class="nav-link">Playground</a>
+      <a href="auth.html?mode=signin" class="nav-link">Log In</a>
+      <a href="auth.html?mode=signup" class="btn btn-primary sm-btn">Get Started</a>
+    </div>
+  </nav>
+
+  <main class="welcome-hero">
+    <!-- Ambient Orbs -->
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+
+    <div class="hero-content">
+      <div class="hero-text-area">
+        <h1 class="hero-title">Level Up Your<br /><span class="text-gradient">Coding Skills</span></h1>
+        <p class="hero-subtitle">Interactive courses, dynamic sandboxes, and epic challenges await. Master Python, Java,
+          C++, and JavaScript through gamified learning.</p>
+
+        <div class="hero-cta-group">
+          <a href="auth.html?mode=signup" class="btn btn-primary hero-btn">Start Learning Free</a>
+          <a href="auth.html?mode=signup" class="btn btn-outline hero-btn">Try Sandbox <span
+              style="margin-left:8px">→</span></a>
+        </div>
+      </div>
+
+      <div class="hero-visual-area">
+        <div class="mascot-hologram-container">
+          <div class="hologram-ring hologram-ring-1"></div>
+          <div class="hologram-ring hologram-ring-2"></div>
+          <div class="hologram-ring hologram-ring-3"></div>
+
+          <!-- Premium Geometric/Sleek Lizard SVG -->
+          <svg class="hero-mascot-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="creeperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#38bdf8" />
+                <stop offset="100%" stop-color="#a371f7" />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <path class="mascot-path" fill="url(#creeperGrad)" filter="url(#glow)" d="M56.8,17.2c-5.1-4.1-13.6-5.8-19.1-1.3c-4.6,3.8-5,11.2-1.3,16.2c3.2,4.3,9.5,6,12.7,10.6c3.4,4.9,2.8,12,0,17.2 
+              c-2.4,4.5-6.8,7.9-10.7,11.3c-4,3.5-9.2,7.4-10,13.1c-0.6,3.8,1.4,7.8,4.7,9.7c3.7,2.2,8.8,1.8,12-1.3c3.4-3.3,4.6-8.9,3.1-13.5
+              c-1.3-4-4.8-6.9-7-10.3c-2.4-3.8-1.7-8.9,1.1-12.1c2.1-2.4,5.4-3.1,8.3-4.3c5-2,9.3-5.3,11.9-10C65.5,37.3,66,31,64.2,25.9
+              C62.8,22,60.1,19.2,56.8,17.2z M45.4,19.9c1.6,0,3,1.3,3,3s-1.3,3-3,3s-3-1.3-3-3S43.8,19.9,45.4,19.9z" />
+            <!-- Cute eye -->
+            <circle cx="45.4" cy="22.9" r="1.5" fill="#fff" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js?v=6"></script>
+</body>
+
+</html>

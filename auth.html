@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamified Coding Creeper — Sign In / Sign Up</title>
+  <link rel="stylesheet" href="style.css?v=5">
+</head>
+<body class="auth-page">
+  <div class="auth-split-layout">
+    <div class="auth-left-pane">
+      <div class="auth-branding">
+        <h1 class="app-title"><span class="title-icon">🦎</span> Gamified Coding Creeper</h1>
+        <p class="auth-quote">"Learn, build, and level up your coding skills."</p>
+      </div>
+      <div class="auth-hero-graphics">
+        <div class="pixel-creeper" style="animation: float 4s ease-in-out infinite;"></div>
+        <div class="glow-orb orb-1" style="position: absolute; top: 10%; left: 10%; width: 200px; height: 200px;"></div>
+        <div class="glow-orb orb-2" style="position: absolute; bottom: 20%; right: 20%; width: 150px; height: 150px; background: rgba(56, 189, 248, 0.2);"></div>
+      </div>
+    </div>
+    
+    <div class="auth-right-pane">
+      <div class="auth-container">
+        <a href="index.html" class="back-link">← Back to Welcome</a>
+        
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" data-tab="signin">Sign In</button>
+          <button type="button" class="auth-tab" data-tab="signup">Create Account</button>
+        </div>
+
+        <section id="signin-section" class="auth-section active">
+          <form id="signin-form" class="auth-form floating-form">
+            <div class="input-group">
+              <input type="email" id="signin-email" required placeholder=" ">
+              <label for="signin-email">Email Address</label>
+            </div>
+            <div class="input-group">
+              <input type="password" id="signin-password" required placeholder=" ">
+              <label for="signin-password">Password</label>
+            </div>
+            <p id="signin-error" class="auth-error" aria-live="polite"></p>
+            <button type="submit" class="btn btn-primary auth-btn">Sign In</button>
+          </form>
+        </section>
+
+        <section id="signup-section" class="auth-section">
+          <form id="signup-form" class="auth-form floating-form">
+            <div class="input-group">
+              <input type="text" id="signup-display" required placeholder=" ">
+              <label for="signup-display">Display Name</label>
+            </div>
+            <div class="input-group">
+              <input type="email" id="signup-email" required placeholder=" ">
+              <label for="signup-email">Email Address</label>
+            </div>
+            <div class="input-group">
+              <input type="password" id="signup-password" required minlength="6" placeholder=" ">
+              <label for="signup-password">Password (min 6 chars)</label>
+            </div>
+            <p id="signup-error" class="auth-error" aria-live="polite"></p>
+            <button type="submit" class="btn btn-primary auth-btn">Create Account</button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js?v=5"></script>
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var mode = params.get('mode');
+      if (mode === 'signup') {
+        document.querySelector('.auth-tab[data-tab="signup"]').click();
+      }
+    })();
+  </script>
+</body>
+</html>

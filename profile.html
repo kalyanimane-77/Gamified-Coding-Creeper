@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamified Coding Creeper — Profile</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="app-shell">
+  <header class="app-header">
+    <div class="brand"><span class="title-icon">🦎</span> Gamified Coding Creeper</div>
+    <nav class="app-nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html" class="active">Profile</a>
+      <button type="button" class="btn-link" id="logout-btn">Logout</button>
+    </nav>
+  </header>
+  <main class="main-content">
+    <div class="profile-header">
+      <div class="profile-avatar" id="avatar">?</div>
+      <div class="profile-info">
+        <h1 id="profile-name">User</h1>
+        <p class="email" id="profile-email"></p>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-pill"><span class="xp">XP</span> <span id="profile-xp">0</span></div>
+      <div class="stat-pill"><span class="level">Level</span> <span id="profile-level">1</span></div>
+    </div>
+    <div class="progress-bar-wrap" style="margin-bottom:1rem;">
+      <div class="progress-bar" id="profile-progress" style="width:0%"></div>
+    </div>
+    <h2>Badges</h2>
+    <div class="badges-grid" id="badges-grid"></div>
+  </main>
+  <script src="content.js"></script>
+  <script src="content-data.js"></script>
+  <script src="script.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>

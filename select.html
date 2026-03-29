@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamified Coding Creeper — Learn</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="app-shell">
+  <header class="app-header">
+    <div class="brand"><span class="title-icon">🦎</span> Gamified Coding Creeper</div>
+    <nav class="app-nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html">Profile</a>
+      <button type="button" class="btn-link" id="logout-btn">Logout</button>
+    </nav>
+  </header>
+  <main class="main-content select-main">
+    <p><a href="dashboard.html" class="back-link">← Back to Dashboard</a></p>
+    <div class="select-hero">
+      <h1 id="select-lang-name">Language</h1>
+      <p class="select-sub">Choose a level, then pick a topic. Complete the quiz to unlock the next topic.</p>
+    </div>
+    <div class="level-tabs" role="tablist">
+      <button type="button" class="level-tab active" data-level="beginner" role="tab">Beginner</button>
+      <button type="button" class="level-tab" data-level="intermediate" role="tab">Intermediate</button>
+      <button type="button" class="level-tab" data-level="advanced" role="tab">Advanced</button>
+    </div>
+    <section class="topic-list-section">
+      <h2 class="section-title" id="level-title">Beginner topics</h2>
+      <div class="topic-list" id="topic-list"></div>
+    </section>
+  </main>
+  <div id="unlock-overlay" class="unlock-overlay" aria-hidden="true">
+    <div class="unlock-modal">
+      <div class="unlock-icon">🔓</div>
+      <h2 class="unlock-title">New topic unlocked!</h2>
+      <p class="unlock-topic-name" id="unlock-topic-name"></p>
+      <button type="button" class="btn btn-primary" id="unlock-dismiss">Continue</button>
+    </div>
+  </div>
+  <script src="content.js?v=4"></script>
+  <script src="content-data.js?v=4"></script>
+  <script src="script.js?v=4"></script>
+  <script src="select.js?v=4"></script>
+</body>
+</html>

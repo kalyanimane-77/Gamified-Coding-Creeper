@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamified Coding Creeper — Leaderboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="app-shell">
+  <header class="app-header">
+    <div class="brand"><span class="title-icon">🦎</span> Gamified Coding Creeper</div>
+    <nav class="app-nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="leaderboard.html" class="active">Leaderboard</a>
+      <a href="profile.html">Profile</a>
+      <button type="button" class="btn-link" id="logout-btn">Logout</button>
+    </nav>
+  </header>
+  <main class="main-content">
+    <h1>Leaderboard</h1>
+    <p style="color:var(--text-muted);margin-bottom:1rem;">Top learners by XP</p>
+    <div class="progress-bar-wrap" style="margin-bottom:1rem;">
+      <div class="progress-bar" id="your-progress" style="width:0%"></div>
+    </div>
+    <table class="leaderboard-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>XP</th>
+          <th>Level</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboard-body"></tbody>
+    </table>
+  </main>
+  <script src="content.js"></script>
+  <script src="content-data.js"></script>
+  <script src="script.js"></script>
+  <script src="leaderboard.js"></script>
+</body>
+</html>

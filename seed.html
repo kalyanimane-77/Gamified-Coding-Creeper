@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seed Database - Gamified Coding Creeper</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 2rem;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+        h1 { color: #58a6ff; }
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        #status {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background: #21262d;
+            text-align: center;
+        }
+        ul { list-style: none; padding: 0; }
+        li {
+            padding: 0.5rem;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            justify-content: space-between;
+        }
+        li:last-child { border-bottom: none; }
+        .success { color: #3fb950; }
+        .error { color: #f85149; }
+        .info { color: #8b949e; }
+        .btn {
+            display: inline-block;
+            background: #238636;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .btn:hover { background: #2ea043; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🌱 Seeding Database</h1>
+        <div id="status">Connecting to Firebase...</div>
+        <ul id="log"></ul>
+        <div style="text-align: center;">
+            <a href="index.html" class="btn">Go to App</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        // Config
+        const firebaseConfig = {
+            databaseURL: "https://gamified-coding-creeper-default-rtdb.firebaseio.com/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const status = document.getElementById('status');
+        const log = document.getElementById('log');
+
+        function logMsg(msg, type = 'info') {
+            const li = document.createElement('li');
+            li.textContent = msg;
+            li.className = type;
+            log.appendChild(li);
+        }
+
+        function safeKey(email) {
+            return email.replace(/\./g, ',');
+        }
+
+        // Sample Data
+        const users = [
+            { 
+                email: 'admin@test.com', 
+                data: { xp: 12500, level: 10, lastSeen: Date.now(), kidsMode: false } 
+            },
+            { 
+                email: 'kid@test.com', 
+                data: { xp: 300, level: 2, lastSeen: Date.now(), kidsMode: true } 
+            },
+            { 
+                email: 'student@test.com', 
+                data: { xp: 5500, level: 7, lastSeen: Date.now(), kidsMode: false } 
+            }
+        ];
+
+        async function seed() {
+            try {
+                const updates = {};
+                users.forEach(u => {
+                    const k = safeKey(u.email);
+                    updates['users/' + k] = u.data;
+                    logMsg(`Prepared: ${u.email}`, 'info');
+                });
+
+                logMsg('Sending data...', 'info');
+                await update(ref(db), updates);
+                
+                status.textContent = "✅ Database Populated Successfully!";
+                status.classList.add('success');
+                logMsg('All records written.', 'success');
+            } catch (e) {
+                status.textContent = "❌ Error: " + e.message;
+                status.classList.add('error');
+                logMsg(e.message, 'error');
+                console.error(e);
+            }
+        }
+
+        // Run automatically
+        seed();
+    </script>
+</body>
+</html>
